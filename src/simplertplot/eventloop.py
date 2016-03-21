@@ -45,7 +45,7 @@ class ThreadedEventLoop():
         self.thread = None
         self.workers = set()
         self._idle = False
-        self.idle_sleeptime = 1
+        self.idle_sleeptime = .1
         self.start()
 
     def start(self):

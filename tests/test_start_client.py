@@ -8,17 +8,21 @@ Module: test_module
 Functions: test_functions
 
 """
+import queue
 import socket
+import sys
 import threading
 import unittest
 from os import makedirs
-import sys
+import subprocess, sys
 # noinspection PyUnresolvedReferences
 from os.path import dirname, join, exists, basename
 from shutil import rmtree
 import logging
-import matplotlib.pyplot
 
+import numpy as np
+
+import simplertplot
 import pickle
 
 logger = logging.getLogger(__name__)
@@ -79,24 +83,35 @@ def tearDownModule():
 
 
 class TestStartclient(unittest.TestCase):
-    def test_start_client(self):
+#     @unittest.skip
+#     def test_start_client(self):
+#         """
+#         @return: None
+#         @rtype: None
+#         """
+#
+#         src = """
+# from simplertplot import start_client
+# import sys
+# start_client.start_client(sys.argv)"""
+#         python = sys.executable
+#         host = 'localhost'
+#         port = 12345
+#         cmd = "%s -c %s \"%s\" %d" % (quote(python), quote(src), host, port)
+#         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+#         spawn_sin_producer((host, port))
+#         p.wait()
+
+    def test_start_client2(self):
         """
         @return: None
         @rtype: None
         """
-        import subprocess, sys, os
-        import simplertplot
-        src = """
-from simplertplot import start_client
-import sys
-start_client.start_client(sys.argv)"""
-        python = sys.executable
-        host = 'localhost'
-        port = 12345
-        cmd = "%s -c %s \"%s\" %d" % (quote(python), quote(src), host, port)
-        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        spawn_sin_producer((host, port))
-        p.wait()
+        from simplertplot.plot import RTPlot
+        plot = RTPlot()
+        plot.show()
+        spawn_sin_producer2(plot)
+        plot.popen.wait()
 
 
 def spawn_sin_producer(addr):
@@ -106,8 +121,15 @@ def spawn_sin_producer(addr):
     # server.settimeout(5)
     sock, addr = server.accept()
     step = 0.0005
-    dt = 0.0001
+    dt = 0.0005
     thread = threading.Thread(None, sin_producer2, "ProdThread", (sock, step, dt), daemon=True)
+    thread.start()
+
+
+def spawn_sin_producer2(plot):
+    step = 0.0005
+    dt = 0.0005
+    thread = threading.Thread(None, sin_producer4, "ProdThread", (plot, step, dt), daemon=True)
     thread.start()
 
 
@@ -141,18 +163,66 @@ def sin_producer2(sock, step=0.05, dt=0.01):
     x = 0
     buf = []
     i = 1
+    q = queue.Queue()
+    prod = simplertplot.workers.UserSideProtocol(sock, q)
+    prod.start()
     while True:
         y = math.sin(x)
         buf.append((x, y))
         x += step
-        if not (i % 1000):
+        if not (i % 1):
             i = 0
-            data = (OP_XYL, buf)
-            s = pickle.dumps(data)
-            try:
-                sock.sendall(s)
-            except ConnectionResetError:
-                return
+            prod.put_xyl(buf)
+            buf.clear()
+        time.sleep(dt)
+        i += 1
+
+
+def sin_producer3(sock, step=0.05, dt=0.01):
+    OP_XY = 0
+    OP_XYL = 1
+    OP_XLYL = 2
+    OP_EXIT = 3
+    x = 0
+    buf = []
+    i = 1
+    q = queue.Queue()
+    prod = simplertplot.workers.UserSideProtocol(sock, q)
+    prod.start()
+    while True:
+        y = math.sin(x)
+        buf.append((x, y))
+        x += step
+        if not (i % 1):
+            i = 0
+            xdata, ydata = tuple(zip(*buf))
+            npx = np.asarray(xdata)
+            npy = np.asarray(ydata)
+            prod.put_np_xlyl(npx, npy)
+            buf.clear()
+        end = time.time() + dt
+        while time.time() < end:
+            pass
+        # time.sleep(dt)
+
+        i += 1
+
+
+def sin_producer4(plot, step=0.05, dt=0.01):
+    OP_XY = 0
+    OP_XYL = 1
+    OP_XLYL = 2
+    OP_EXIT = 3
+    x = 0
+    buf = []
+    i = 1
+    while True:
+        y = math.sin(x)
+        buf.append((x, y))
+        x += step
+        if not (i % 10):
+            i = 0
+            plot.put_xyl(buf)
             buf.clear()
         time.sleep(dt)
         i += 1

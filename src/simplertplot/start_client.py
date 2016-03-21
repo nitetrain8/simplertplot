@@ -33,7 +33,7 @@ def start_client(argv):
     host = argv[1]
     port = int(argv[2])
     addr = (host, port)
-    plotter = RTPlotter(addr, 100000, 'ggplot')
+    plotter = RTPlotter(addr, 10000, 'ggplot')
     plotter.run_forever()
 
 

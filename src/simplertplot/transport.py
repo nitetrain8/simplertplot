@@ -13,6 +13,7 @@ __author__ = 'Nathan Starkweather'
 import logging
 import socket
 from simplertplot import util
+from select import select
 
 logger = logging.getLogger(__name__)
 _h = logging.StreamHandler()
@@ -25,9 +26,16 @@ del _h, _f
 
 
 class SocketTransport():
-    def __init__(self, addr):
-        self.addr = addr
-        self.connect()
+    def __init__(self, sock_or_addr):
+
+        if isinstance(sock_or_addr, socket.socket):
+            self.addr = sock_or_addr.getsockname()
+            self.sock = sock_or_addr
+            self.rfile = self.sock.makefile('rb')
+            self.export_attrs()
+        else:
+            self.addr = sock_or_addr
+            self.connect()
 
     def connect(self):
         self.sock = socket.socket()
@@ -55,6 +63,9 @@ class SocketTransport():
     def write(self, msg):
         return self.sock.sendall(msg)
 
+    def have_data(self):
+        return self.sock in (select((self.sock,), (), (), 0))[0]
+
     @util.borrow_docstring(socket.socket.recv_into)
     def recv_into(self, b):
         pass
@@ -79,3 +90,21 @@ class SocketTransport():
     def read(self, n=-1):
         pass
 
+
+class SimpleServer():
+    def __init__(self, host, port=0):
+        sock = socket.socket()
+        sock.bind((host, port))
+        sock.listen(1)
+        self.addr = sock.getsockname()
+        self.sock = sock
+
+    def get_addr(self):
+        return self.addr
+
+    def accept_connection(self, block=True):
+        r, w, x = select((self.sock,), (), (), None if block else 0)
+        if self.sock in r:
+            c, _ = self.sock.accept()
+            return c
+        return None
