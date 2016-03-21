@@ -44,6 +44,7 @@ def quote(s):
     s = s.strip('"').strip("'")
     return '"%s"' % s
 
+
 def setUpModule():
     for d in temp_dir, test_input, local_test_input:
         try:
@@ -102,16 +103,19 @@ def spawn_sin_producer(addr):
     server = socket.socket()
     server.bind(addr)
     server.listen(1)
-    server.settimeout(5)
+    # server.settimeout(5)
     sock, addr = server.accept()
-    step = 0.05
-    thread = threading.Thread(None, sin_producer2, "ProdThread", (sock, step), daemon=True)
+    step = 0.0005
+    dt = 0.0001
+    thread = threading.Thread(None, sin_producer2, "ProdThread", (sock, step, dt), daemon=True)
     thread.start()
+
 
 import math
 import time
 
-def sin_producer(sock, step=0.05):
+
+def sin_producer(sock, step=0.05, dt=0.05):
     OP_XY = 0
     OP_XYL = 1
     OP_XLYL = 2
@@ -121,27 +125,37 @@ def sin_producer(sock, step=0.05):
         y = math.sin(x)
         data = (OP_XY, (x, y))
         s = pickle.dumps(data)
+        import io
+        b = io.BytesIO()
+        pickle.load(b)
         sock.sendall(s)
         x += step
-        time.sleep(0.05)
+        time.sleep(dt)
 
-def sin_producer2(sock, step=0.05):
+
+def sin_producer2(sock, step=0.05, dt=0.01):
     OP_XY = 0
     OP_XYL = 1
     OP_XLYL = 2
     OP_EXIT = 3
     x = 0
     buf = []
+    i = 1
     while True:
         y = math.sin(x)
         buf.append((x, y))
         x += step
-        if (x / step) % 100:
+        if not (i % 1000):
+            i = 0
             data = (OP_XYL, buf)
             s = pickle.dumps(data)
-            sock.sendall(s)
+            try:
+                sock.sendall(s)
+            except ConnectionResetError:
+                return
             buf.clear()
-        time.sleep(0.01)
+        time.sleep(dt)
+        i += 1
 
 
 if __name__ == '__main__':

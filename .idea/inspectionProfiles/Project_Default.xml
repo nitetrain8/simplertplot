@@ -39,6 +39,9 @@
           <option value="base.urls" />
           <option value="lst" />
           <option value="simplertplot.connection.RTPlotClientConnection.OP_DATA" />
+          <option value="dlock" />
+          <option value="y_q" />
+          <option value="x_q" />
         </list>
       </option>
     </inspection_tool>

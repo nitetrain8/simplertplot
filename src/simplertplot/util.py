@@ -1,11 +1,13 @@
 """
 
 Created by: Nathan Starkweather
-Created on: 03/19/2016
+Created on: 03/20/2016
 Created in: PyCharm Community Edition
 
 
 """
+import io
+
 __author__ = 'Nathan Starkweather'
 
 import logging
@@ -19,9 +21,15 @@ logger.propagate = False
 logger.setLevel(logging.DEBUG)
 del _h, _f
 
-from . import util
-from . import queues
-from . import workers
-from . import client_plotter
-from . import start_client
 
+def borrow_docstring(lender, sep='\n\n'):
+    def decorator(f):
+        buf = io.StringIO()
+        buf.write("<Borrowed Docstring>:\n\n")
+        buf.write(f.__doc__ or '')
+        buf.write(sep if f.__doc__ else '')
+        buf.write(lender.__doc__ or "")
+        f.__doc__ = buf.getvalue()
+        return f
+
+    return decorator
