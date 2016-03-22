@@ -102,13 +102,15 @@ class PlotProcessManager():
         self.thread = None
         self.plots = set()
         self.com_channel = None
-        self.event_loop = None
+        self.message_loop = None
+        self.plot_loop = None
         self.server = None
-        self.spawn_event_thread()
+        self.spawn_message_pump()
         if self.client_side:
             assert server_addr
             self.reconnect_server()
-            self.event_loop.add_worker(self.client_listener)
+            self.spawn_plot_loop()
+            self.plot_loop.add_worker(self.client_listener)
 
     def reconnect_server(self):
         s = socket.socket()
@@ -128,20 +130,20 @@ class PlotProcessManager():
             host, port = self.server.get_addr()
         cmd = "%s -c %s %s %d" % (util.quote(python), util.quote(_spawn_src), host, port)
         self.popen = subprocess.Popen(cmd)
-        sock = self.server.accept_connection()
+        sock = self.server.accept_connection(False)
         self.com_channel = _ManagerCom(sock)
 
     def new_user_plot(self, plot, queue_size):
         if self.popen is None: self.start_process()
         self.plots.add(plot)
-        client_sock = self.spawn_new_client(plot.max_pts, plot.style)
+        client_sock = self.request_new_client()
         q = queue.Queue(queue_size)
-        proto = protocol.UserSideProtocol(client_sock, q, loop=self.event_loop)
+        proto = protocol.UserSideProtocol(client_sock, q, loop=self.message_loop)
         return proto, q
 
-    def spawn_new_client(self, *args):
-        self.com_channel.send_op(self.NEW_CLIENT, args)
-        new_sock = self.server.accept_connection()
+    def request_new_client(self):
+        self.com_channel.send_op(self.NEW_CLIENT, None)
+        new_sock = self.server.accept_connection(False)
         return new_sock
 
     def client_listener(self):
@@ -152,12 +154,26 @@ class PlotProcessManager():
                 logger.debug("OP_NEW_CLIENT")
                 s = socket.socket()
                 s.connect(self.addr)
-                proto = protocol.ClientSideProtocol(s)
-                plot = proto.handshake(*arg)
+                proto = protocol.ClientSideProtocol(s, loop=self.message_loop)
+                plot = proto.handshake()
+                self.plot_loop.add_worker(plot.run_plot())
                 self.plots.add(plot)
+                proto.start()
 
-    def spawn_event_thread(self):
+    def _reg_new_client_plot(self, plot):
+        self.plots.add(plot)
+        self.plot_loop.add_worker(plot.run_plot())
+
+    def spawn_message_pump(self):
         loop = eventloop.ThreadedEventLoop(self.client_side)
         loop.start()
-        self.event_loop = loop
+        self.message_loop = loop
+
+    def spawn_plot_loop(self):
+        self.plot_loop = eventloop.EventLoop()
+
+    def run_plot_loop(self):
+        for p in self.plots:
+            self.plot_loop.add_worker(p.run_plot())
+        self.plot_loop.run_forever()
 

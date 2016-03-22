@@ -36,6 +36,7 @@ class SocketTransport():
         else:
             self.addr = sock_or_addr
             self.connect()
+        # self.sock.setblocking(True)
 
     def connect(self):
         self.sock = socket.socket()

@@ -39,7 +39,8 @@ class RTPlot():
         from . import manager
         m = manager.get_manager()
         self.protocol, self.queue = m.new_user_plot(self, self.max_pts)
-        self.protocol.handshake()
+        self.protocol.handshake(self.max_pts, self.style)
+        self.protocol.start()
 
     def put_xy(self, x, y):
         self.protocol.put_xy(x, y)

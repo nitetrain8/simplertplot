@@ -108,10 +108,11 @@ class TestStartclient(unittest.TestCase):
         @rtype: None
         """
         from simplertplot.userplot import RTPlot
+        from simplertplot.manager import get_manager
         plot = RTPlot()
         plot.show()
         spawn_sin_producer2(plot)
-        plot.popen.wait()
+        get_manager().popen.wait()
 
 
 def spawn_sin_producer(addr):

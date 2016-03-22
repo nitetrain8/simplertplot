@@ -8,6 +8,7 @@ Created in: PyCharm Community Edition
 """
 import os
 
+import matplotlib
 from simplertplot.client_plotter import RTPlotter
 from simplertplot import manager
 
@@ -35,7 +36,7 @@ def startup_client(args):
     port = int(args[1])
     addr = (host, port)
     m = manager.create_client_manager(addr)
-    m.event_loop.run
+    m.run_plot_loop()
 
 
 if __name__ == '__main__':

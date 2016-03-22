@@ -40,27 +40,18 @@ def get_event_loop():
     return _event_loop
 
 
-class ThreadedEventLoop():
-    def __init__(self, client_side=False):
-        self.client_side = client_side
-        self.thread = None
+class EventLoop():
+    def __init__(self):
         self.workers = set()
         self._idle = False
         self.idle_sleeptime = .1
-        self.start()
+        self.run_forever = self.start
 
     def start(self):
-        if self.thread and self.thread.is_alive():
-            self._idle = False
-        else:
-            self.thread = threading.Thread(None, self.mainloop, "RTPlot%sThread" %
-                                           ("Client" if self.client_side else "Server"), daemon=True)
-            self.thread.start()
+        self.mainloop()
 
     def stop(self):
         raise _StopEventLoop
-
-    run_forever = start
 
     def mainloop(self):
         while True:
@@ -112,3 +103,21 @@ class ThreadedEventLoop():
             self.workers.remove(w)
         except KeyError:
             logger.warning("Attempted to remove non-existent worker: %s", w)
+
+
+class ThreadedEventLoop(EventLoop):
+
+    def __init__(self, client_side=False):
+        super().__init__()
+        self.client_side = client_side
+        self.thread = None
+        self.start()
+
+    def start(self):
+        if self.thread and self.thread.is_alive():
+            self._idle = False
+        else:
+            self.thread = threading.Thread(None, self.mainloop, "RTPlot%sThread" %
+                                           ("Client" if self.client_side else "Server"), daemon=True)
+            self.thread.start()
+

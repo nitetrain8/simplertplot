@@ -16,6 +16,7 @@ from simplertplot import serializer
 from simplertplot.eventloop import get_event_loop
 from simplertplot.queues import RingBuffer
 from simplertplot.transport import SocketTransport
+from . import exceptions
 
 __author__ = 'Nathan Starkweather'
 
@@ -29,6 +30,10 @@ logger.addHandler(_h)
 logger.propagate = False
 logger.setLevel(logging.DEBUG)
 del _h, _f
+
+
+class BadHandshake(exceptions.RTPlotException):
+    pass
 
 
 class BaseProtocol():
@@ -53,6 +58,7 @@ class BaseProtocol():
         self.loop = loop
         self.serializer = serializer.get_serializer(serial_method)
         self._state = self.ST_STARTUP
+        self.dtype = self._NP_DTYPE
 
     @contextlib.contextmanager
     def lock_queue(self):
@@ -133,9 +139,11 @@ class UserSideProtocol(BaseProtocol):
     def handshake(self, max_pts, style):
         assert self._state == self.ST_STARTUP
         self._state = self.ST_HANDSHAKE
-        data = self.serializer.dumps((max_pts, style))
+        data = self.serializer.dumps((max_pts, style, self.dtype))
         self.transport.write(data)
         ack = self.transport.readline()
+        if ack != b"ACK YAY\n":
+            raise BadHandshake(ack)
 
 
 class ClientSideProtocol(BaseProtocol):
@@ -156,7 +164,6 @@ class ClientSideProtocol(BaseProtocol):
         self.xq = None
         self.yq = None
         self.addr = addr_or_sock
-        self.thread = None
         self.current_update = 0
         self.serializer = serializer.PickleSerializer()
         self.step_work = self.pump_data().__next__
@@ -213,13 +220,17 @@ class ClientSideProtocol(BaseProtocol):
                     ex_y(yl)
                 self.current_update += len(xl)
             else:
+                logger.error("Invalid code: %d %s" % (code, data))
                 raise ValueError(code)
 
-    def handshake(self, max_pts, style, dtype=float):
+    def handshake(self):
         from . import client_plotter
+        max_pts, style, dtype = self.serializer.load(self.transport)
+        # max_pts = 1000; style='ggplot'; dtype=float
         self.xq = RingBuffer(max_pts, dtype)
         self.yq = RingBuffer(max_pts, dtype)
         plot = client_plotter.RTPlotter(self, self.xq, self.yq, max_pts, style)
+        self.transport.write(b"ACK YAY\n")
         return plot
 
 

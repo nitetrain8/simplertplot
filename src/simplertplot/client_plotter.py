@@ -79,18 +79,14 @@ class RTPlotter():
         figure = pyplot.figure(num, figsize, dpi, facecolor, edgecolor, frameon)
         return figure
 
-    def run_forever(self):
-        self.setup_pyplot()
-        self.start_client()
-        try:
-            self.run_plot()
-        except tk.TclError:  # often throws on shutdown
-            pass
-
     def start_client(self):
         self.client.start()
 
     def run_plot(self):
+        self.setup_pyplot()
+        return self._run_plot().__next__
+
+    def _run_plot(self):
 
         figure = self.figure
         figure.show()
@@ -121,6 +117,7 @@ class RTPlotter():
 
         # mainloop
         while True:
+            yield
             fps = frames / (_time() - start)
             debug_lines[0] = ("FPS:%.1f" % fps)
             dbg_txt = '\n'.join(debug_lines)
