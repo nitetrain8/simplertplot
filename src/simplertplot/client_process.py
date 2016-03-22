@@ -9,8 +9,7 @@ Created in: PyCharm Community Edition
 import os
 
 from simplertplot.client_plotter import RTPlotter
-from simplertplot.workers import ClientProtocol
-from simplertplot.queues import RingBuffer
+from simplertplot import manager
 
 __author__ = 'Nathan Starkweather'
 
@@ -29,13 +28,16 @@ logger.setLevel(logging.DEBUG)
 del _h, _f, _h2
 
 
-def start_client(argv):
-    host = argv[1]
-    port = int(argv[2])
+def startup_client(args):
+    if args[0] == '-c' or os.path.exists(args[0]):
+        args = args[1:]
+    host = args[0]
+    port = int(args[1])
     addr = (host, port)
-    plotter = RTPlotter(addr, 10000, 'ggplot')
-    plotter.run_forever()
+    m = manager.create_client_manager(addr)
+    m.event_loop.run
 
 
 if __name__ == '__main__':
-    start_client()
+    import sys
+    startup_client(sys.argv[1:])

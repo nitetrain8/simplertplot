@@ -13,7 +13,7 @@ import tkinter as tk
 from matplotlib import pyplot
 
 from simplertplot.queues import RingBuffer
-from simplertplot.workers import ClientProtocol
+from simplertplot.protocol import ClientSideProtocol
 
 __author__ = 'Nathan Starkweather'
 
@@ -34,10 +34,10 @@ class RTPlotter():
     :type client: worker.ConsumerClientWorker
     """
 
-    def __init__(self, addr, max_pts=1000, style='ggplot'):
+    def __init__(self, client, xq, yq, max_pts=1000, style='ggplot'):
         assert max_pts > 0, "max_pts < 0: %s" % max_pts
-        self.x_queue = RingBuffer(max_pts)
-        self.y_queue = RingBuffer(max_pts)
+        self.x_queue = xq
+        self.y_queue = yq
         self.x_data = []
         self.y_data = []
         self.max_pts = max_pts
@@ -48,7 +48,7 @@ class RTPlotter():
         self.npts_text = None
         self.debug_text = None
         self.debug_lines = ["", "", ""]
-        self.client = ClientProtocol(addr, self.x_queue, self.y_queue)
+        self.client = client
 
     def clear_pyplot(self):
         if self.figure:
@@ -146,9 +146,7 @@ class RTPlotter():
             if self.client.current_update:
                 self.x_data = self.x_queue.get()
                 self.y_data = self.y_queue.get()
-                txt1 = "Current Queue Read: %d" % self.client.current_update
-                self.debug_lines[2] = txt1
-                assert len(self.x_data) == len(self.y_data)
+                self.debug_lines[2] = "Current Queue Read: %d" % self.client.current_update
                 self.client.current_update = 0
                 return True
         return False

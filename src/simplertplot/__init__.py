@@ -21,7 +21,12 @@ del _h, _f
 
 from . import util
 from . import queues
-from . import workers
+from . import serializer
+from . import transport
+from . import protocol
+from . import eventloop
+from . import userplot
 from . import client_plotter
-from . import start_client
+from . import client_process
+from . import manager
 

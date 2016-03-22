@@ -7,12 +7,12 @@ Created in: PyCharm Community Edition
 
 """
 import contextlib
-import pickle
 import queue
 import threading
 
 import numpy as np
 
+from simplertplot import serializer
 from simplertplot.eventloop import get_event_loop
 from simplertplot.queues import RingBuffer
 from simplertplot.transport import SocketTransport
@@ -39,20 +39,20 @@ class BaseProtocol():
     OP_NP_XYL = 4
     OP_NP_XLYL = 5
     transport_factory = SocketTransport
-    _NP_DTYPE = np.float64
+    _NP_DTYPE = float
 
-    def __init__(self, addr_or_sock, loop, serial_method='pickle'):
+    ST_STARTUP = 0
+    ST_HANDSHAKE = 1
+    ST_PUMP = 2
+
+    def __init__(self, addr_or_sock, loop, serial_method=None):
         self.dlock = threading.Lock()
         self.transport = self.transport_factory(addr_or_sock)
         if loop is None:
             loop = get_event_loop()
         self.loop = loop
-
-        if serial_method == 'pickle':
-            self.deserializer = pickle.load
-            self.serializer = pickle.dumps
-        else:
-            raise ValueError(serial_method)
+        self.serializer = serializer.get_serializer(serial_method)
+        self._state = self.ST_STARTUP
 
     @contextlib.contextmanager
     def lock_queue(self):
@@ -63,10 +63,10 @@ class BaseProtocol():
         raise NotImplementedError
 
     def start(self):
-        self.loop.add_worker(self)
+        self.loop.add_worker(self.step_work)
 
     def stop(self):
-        self.loop.remove_worker(self)
+        self.loop.remove_worker(self.step_work)
 
 
 class UserSideProtocol(BaseProtocol):
@@ -89,7 +89,7 @@ class UserSideProtocol(BaseProtocol):
             op, data = self._queue.get(False, None)
         except queue.Empty:
             return
-        msg = self.serializer((op, data))
+        msg = self.serializer.dumps((op, data))
         self.transport.write(msg)
 
     def put_xy(self, x, y):
@@ -130,11 +130,18 @@ class UserSideProtocol(BaseProtocol):
         yd = np.asarray(npyl, self._NP_DTYPE).tobytes()
         self._queue.put((self.OP_NP_XLYL, (xd, yd)))
 
+    def handshake(self, max_pts, style):
+        assert self._state == self.ST_STARTUP
+        self._state = self.ST_HANDSHAKE
+        data = self.serializer.dumps((max_pts, style))
+        self.transport.write(data)
+        ack = self.transport.readline()
 
-class ClientProtocol(BaseProtocol):
+
+class ClientSideProtocol(BaseProtocol):
     transport_factory = SocketTransport
 
-    def __init__(self, addr_or_sock, xq, yq, *, loop=None):
+    def __init__(self, addr_or_sock, *, loop=None):
         """
         :param addr_or_sock: address for socket.socket()
         :type addr_or_sock: (str, int)
@@ -146,11 +153,12 @@ class ClientProtocol(BaseProtocol):
 
         super().__init__(addr_or_sock, loop)
         self.dlock = threading.Lock()
-        self.xq = xq
-        self.yq = yq
+        self.xq = None
+        self.yq = None
         self.addr = addr_or_sock
         self.thread = None
         self.current_update = 0
+        self.serializer = serializer.PickleSerializer()
         self.step_work = self.pump_data().__next__
 
     def step_work(self):
@@ -164,14 +172,14 @@ class ClientProtocol(BaseProtocol):
         lock = self.dlock
         tp = self.transport
         self.current_update = 0
-        deserializer = self.deserializer
+        load_data = self.serializer.load
 
         while True:
             yield
             if not tp.have_data():
                 continue
             try:
-                code, data = deserializer(tp)
+                code, data = load_data(tp)
             except EOFError:
                 logger.debug("EOFError loading pickle: Connection Lost")
                 tp.reconnect()
@@ -206,5 +214,13 @@ class ClientProtocol(BaseProtocol):
                 self.current_update += len(xl)
             else:
                 raise ValueError(code)
+
+    def handshake(self, max_pts, style, dtype=float):
+        from . import client_plotter
+        self.xq = RingBuffer(max_pts, dtype)
+        self.yq = RingBuffer(max_pts, dtype)
+        plot = client_plotter.RTPlotter(self, self.xq, self.yq, max_pts, style)
+        return plot
+
 
 

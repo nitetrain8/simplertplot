@@ -2,14 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd684da4-6dbb-4653-bbfd-550e61bb8ecf" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/simplertplot/plot.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/__init__.py" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/simplertplot/manager.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/simplertplot/serializer.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/simplertplot/plot.py" afterPath="$PROJECT_DIR$/src/simplertplot/userplot.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/simplertplot/start_client.py" afterPath="$PROJECT_DIR$/src/simplertplot/client_process.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/simplertplot/workers.py" afterPath="$PROJECT_DIR$/src/simplertplot/protocol.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simplertplot/__init__.py" afterPath="$PROJECT_DIR$/src/simplertplot/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simplertplot/client_plotter.py" afterPath="$PROJECT_DIR$/src/simplertplot/client_plotter.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simplertplot/eventloop.py" afterPath="$PROJECT_DIR$/src/simplertplot/eventloop.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simplertplot/start_client.py" afterPath="$PROJECT_DIR$/src/simplertplot/start_client.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simplertplot/transport.py" afterPath="$PROJECT_DIR$/src/simplertplot/transport.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simplertplot/util.py" afterPath="$PROJECT_DIR$/src/simplertplot/util.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simplertplot/workers.py" afterPath="$PROJECT_DIR$/src/simplertplot/workers.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/.cache/v/cache/lastfailed" afterPath="$PROJECT_DIR$/tests/.cache/v/cache/lastfailed" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_start_client.py" afterPath="$PROJECT_DIR$/tests/test_start_client.py" />
     </list>
     <ignored path="simplertplot.iws" />
@@ -30,51 +33,31 @@
       <content type="file-editors">
         <state>
           <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file leaf-file-name="start_client.py" pinned="false" current-in-tab="false">
-              <entry file="file://$PROJECT_DIR$/src/simplertplot/start_client.py">
+            <file leaf-file-name="client_process.py" pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/src/simplertplot/client_process.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state vertical-scroll-proportion="0.0">
-                    <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+                  <state vertical-scroll-proportion="0.63670415">
+                    <caret line="37" column="20" selection-start-line="37" selection-start-column="20" selection-end-line="37" selection-end-column="20" />
                     <folding />
                   </state>
                 </provider>
               </entry>
             </file>
-            <file leaf-file-name="workers.py" pinned="false" current-in-tab="false">
-              <entry file="file://$PROJECT_DIR$/src/simplertplot/workers.py">
+            <file leaf-file-name="protocol.py" pinned="false" current-in-tab="false">
+              <entry file="file://$PROJECT_DIR$/src/simplertplot/protocol.py">
                 <provider selected="true" editor-type-id="text-editor">
                   <state vertical-scroll-proportion="0.0">
-                    <caret line="40" column="4" selection-start-line="40" selection-start-column="4" selection-end-line="40" selection-end-column="4" />
+                    <caret line="137" column="39" selection-start-line="137" selection-start-column="39" selection-end-line="137" selection-end-column="39" />
                     <folding />
                   </state>
                 </provider>
               </entry>
             </file>
-            <file leaf-file-name="numeric.py" pinned="false" current-in-tab="false">
-              <entry file="file://C:/Python34/Lib/site-packages/numpy/core/numeric.py">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state vertical-scroll-proportion="0.0">
-                    <caret line="381" column="27" selection-start-line="381" selection-start-column="27" selection-end-line="381" selection-end-column="27" />
-                    <folding />
-                  </state>
-                </provider>
-              </entry>
-            </file>
-            <file leaf-file-name="transport.py" pinned="false" current-in-tab="true">
+            <file leaf-file-name="transport.py" pinned="false" current-in-tab="false">
               <entry file="file://$PROJECT_DIR$/src/simplertplot/transport.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state vertical-scroll-proportion="0.33333334">
-                    <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-                    <folding />
-                  </state>
-                </provider>
-              </entry>
-            </file>
-            <file leaf-file-name="select.py" pinned="false" current-in-tab="false">
-              <entry file="file://$USER_HOME$/.PyCharm50/system/python_stubs/-1442825926/select.py">
-                <provider selected="true" editor-type-id="text-editor">
                   <state vertical-scroll-proportion="0.0">
-                    <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
+                    <caret line="119" column="33" selection-start-line="119" selection-start-column="33" selection-end-line="119" selection-end-column="33" />
                     <folding />
                   </state>
                 </provider>
@@ -91,33 +74,33 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="test_start_client.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="test_start_client.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/test_start_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.8844087">
-              <caret line="111" column="19" selection-start-line="111" selection-start-column="19" selection-end-line="111" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
               <folding>
-                <element signature="e#3365#3664#0" expanded="false" />
+                <element signature="e#3369#3668#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="util.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/simplertplot/util.py">
+      <file leaf-file-name="userplot.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/simplertplot/userplot.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+              <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="plot.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/simplertplot/plot.py">
+      <file leaf-file-name="manager.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/simplertplot/manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="53" column="29" selection-start-line="53" selection-start-column="29" selection-end-line="53" selection-end-column="29" />
+            <state vertical-scroll-proportion="0.73747015">
+              <caret line="155" column="44" selection-start-line="155" selection-start-column="44" selection-end-line="155" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -127,37 +110,17 @@
         <entry file="file://$PROJECT_DIR$/src/simplertplot/client_plotter.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="25" column="24" selection-start-line="25" selection-start-column="24" selection-end-line="25" selection-end-column="24" />
+              <caret line="39" column="25" selection-start-line="39" selection-start-column="25" selection-end-line="39" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="yappi.py" pinned="false" current-in-tab="false">
-        <entry file="file://C:/Python34/Lib/site-packages/yappi.py">
+      <file leaf-file-name="serializer.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/simplertplot/serializer.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="684" column="43" selection-start-line="684" selection-start-column="43" selection-end-line="684" selection-end-column="43" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-        <entry file="file://C:/Python34/Lib/logging/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="943" column="8" selection-start-line="943" selection-start-column="8" selection-end-line="943" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="eventloop.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/simplertplot/eventloop.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="82" column="34" selection-start-line="82" selection-start-column="34" selection-end-line="82" selection-end-column="34" />
+              <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -167,7 +130,17 @@
         <entry file="file://$PROJECT_DIR$/src/simplertplot/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="21" column="18" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="18" />
+              <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="eventloop.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/simplertplot/eventloop.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="98" column="0" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -186,6 +159,11 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -193,18 +171,23 @@
         <option value="$PROJECT_DIR$/tests/handle.py" />
         <option value="$PROJECT_DIR$/src/simplertplot/worker.py" />
         <option value="$PROJECT_DIR$/src/simplertplot/queues.py" />
-        <option value="$PROJECT_DIR$/src/simplertplot/__init__.py" />
         <option value="$PROJECT_DIR$/tests/test_ringbuffer.py" />
         <option value="$PROJECT_DIR$/tests/test_transport..py" />
         <option value="$PROJECT_DIR$/tests/test_transport.py" />
-        <option value="$PROJECT_DIR$/src/simplertplot/start_client.py" />
-        <option value="$PROJECT_DIR$/src/simplertplot/eventloop.py" />
-        <option value="$PROJECT_DIR$/src/simplertplot/client_plotter.py" />
         <option value="$PROJECT_DIR$/src/simplertplot/workers.py" />
         <option value="$PROJECT_DIR$/src/simplertplot/util.py" />
+        <option value="$PROJECT_DIR$/tests/test_start_client.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/start_client.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/serializer.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/__init__.py" />
         <option value="$PROJECT_DIR$/src/simplertplot/transport.py" />
         <option value="$PROJECT_DIR$/src/simplertplot/plot.py" />
-        <option value="$PROJECT_DIR$/tests/test_start_client.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/client_plotter.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/userplot.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/protocol.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/eventloop.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/client_process.py" />
+        <option value="$PROJECT_DIR$/src/simplertplot/manager.py" />
       </list>
     </option>
   </component>
@@ -259,6 +242,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -315,7 +299,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -611,59 +594,65 @@
       <option name="project" value="LOCAL" />
       <updated>1458538092743</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="I can't believe this thing actually works. Plot.show()!!!">
+      <created>1458546092273</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1458546092273</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 29m 42s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 16m 48s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 30m 06s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 17m 04s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 30m 33s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 17m 28s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 31m 06s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 19m 06s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 31m 21s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 20m 13s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 32m 01s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 35m 36s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 32m 24s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 35m 53s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 38m 18s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 36m 50s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client - 2016.03.21 at 00h 38m 33s.xml">
-      <configuration name="py.test in TestStartclient and test_start_client" configurationId="tests" />
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 44m 20s.xml">
+      <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 00h 38m 53s.xml">
+    <history-entry file="py_test_in_TestStartclient_and_test_start_client2 - 2016.03.21 at 20h 44m 48s.xml">
       <configuration name="py.test in TestStartclient and test_start_client2" configurationId="tests" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="PlantUML" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20051414" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293011" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293011" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4623656" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19794345" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293011" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4623656" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39919356" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.39919356" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -684,7 +673,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="I can't believe this thing actually works" />
-    <option name="LAST_COMMIT_MESSAGE" value="I can't believe this thing actually works" />
+    <MESSAGE value="I can't believe this thing actually works. Plot.show()!!!" />
+    <option name="LAST_COMMIT_MESSAGE" value="I can't believe this thing actually works. Plot.show()!!!" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -711,24 +701,34 @@
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint type="python-line">
-          <url>file://$PROJECT_DIR$/src/simplertplot/workers.py</url>
+          <url>file://$PROJECT_DIR$/src/simplertplot/protocol.py</url>
           <line>91</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint type="python-line">
-          <url>file://$PROJECT_DIR$/src/simplertplot/workers.py</url>
+          <url>file://$PROJECT_DIR$/src/simplertplot/protocol.py</url>
           <line>88</line>
           <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/src/simplertplot/workers.py</url>
-          <line>199</line>
+          <url>file://$PROJECT_DIR$/src/simplertplot/protocol.py</url>
+          <line>207</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_start_client.py</url>
           <line>223</line>
           <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/simplertplot/manager.py</url>
+          <line>130</line>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/src/simplertplot/protocol.py</url>
+          <line>137</line>
+          <option name="timeStamp" value="45" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -742,7 +742,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="39" />
+      <option name="time" value="46" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -755,21 +755,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tests/handle.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="43" column="31" selection-start-line="43" selection-start-column="31" selection-end-line="43" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python34/Lib/multiprocessing/spawn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="99" column="30" selection-start-line="99" selection-start-column="30" selection-end-line="99" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Python34/Lib/multiprocessing/reduction.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -784,7 +769,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/start_client.py">
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/client_process.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -803,7 +788,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="318" column="0" selection-start-line="318" selection-start-column="0" selection-end-line="318" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -840,7 +824,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.84408605">
           <caret line="286" column="0" selection-start-line="286" selection-start-column="0" selection-end-line="286" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -862,7 +845,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="99" column="30" selection-start-line="99" selection-start-column="30" selection-end-line="99" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -901,7 +883,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.37365592">
           <caret line="1071" column="0" selection-start-line="1071" selection-start-column="0" selection-end-line="1071" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -940,7 +921,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.63978493">
           <caret line="26" column="12" selection-start-line="26" selection-start-column="12" selection-end-line="26" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -948,7 +928,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="2.9247313">
           <caret line="64" column="6" selection-start-line="64" selection-start-column="6" selection-end-line="64" selection-end-column="6" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -985,7 +964,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="999" column="0" selection-start-line="999" selection-start-column="0" selection-end-line="999" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1001,14 +979,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.74462366">
           <caret line="180" column="18" selection-start-line="180" selection-start-column="18" selection-end-line="180" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="21" column="18" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="18" />
           <folding />
         </state>
       </provider>
@@ -1049,23 +1019,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33174226">
           <caret line="117" column="0" selection-start-line="117" selection-start-column="0" selection-end-line="118" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python34/Lib/logging/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="943" column="8" selection-start-line="943" selection-start-column="8" selection-end-line="943" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/eventloop.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="82" column="34" selection-start-line="82" selection-start-column="34" selection-end-line="82" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1085,46 +1038,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Python34/Lib/site-packages/numpy/core/numeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="381" column="27" selection-start-line="381" selection-start-column="27" selection-end-line="381" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/start_client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm50/system/python_stubs/-1442825926/select.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/workers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="40" column="4" selection-start-line="40" selection-start-column="4" selection-end-line="40" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/client_plotter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="25" column="24" selection-start-line="25" selection-start-column="24" selection-end-line="25" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/simplertplot/util.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1133,28 +1046,108 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/plot.py">
+    <entry file="file://C:/Python34/Lib/logging/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.023709903">
+          <caret line="943" column="8" selection-start-line="943" selection-start-column="8" selection-end-line="943" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm50/system/python_stubs/-1442825926/select.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.02122347">
+          <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python34/Lib/site-packages/numpy/core/numeric.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.02122347">
+          <caret line="381" column="27" selection-start-line="381" selection-start-column="27" selection-end-line="381" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/transport.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="53" column="29" selection-start-line="53" selection-start-column="29" selection-end-line="53" selection-end-column="29" />
+          <caret line="119" column="33" selection-start-line="119" selection-start-column="33" selection-end-line="119" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/serializer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/client_plotter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="39" column="25" selection-start-line="39" selection-start-column="25" selection-end-line="39" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/userplot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_start_client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.8844087">
-          <caret line="111" column="19" selection-start-line="111" selection-start-column="19" selection-end-line="111" selection-end-column="19" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
           <folding>
-            <element signature="e#3365#3664#0" expanded="false" />
+            <element signature="e#3369#3668#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/simplertplot/transport.py">
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/protocol.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="137" column="39" selection-start-line="137" selection-start-column="39" selection-end-line="137" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/client_process.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.63670415">
+          <caret line="37" column="20" selection-start-line="37" selection-start-column="20" selection-end-line="37" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/eventloop.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="98" column="0" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simplertplot/manager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.73747015">
+          <caret line="155" column="44" selection-start-line="155" selection-start-column="44" selection-end-line="155" selection-end-column="44" />
           <folding />
         </state>
       </provider>

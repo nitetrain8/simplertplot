@@ -41,7 +41,8 @@ def get_event_loop():
 
 
 class ThreadedEventLoop():
-    def __init__(self):
+    def __init__(self, client_side=False):
+        self.client_side = client_side
         self.thread = None
         self.workers = set()
         self._idle = False
@@ -52,7 +53,8 @@ class ThreadedEventLoop():
         if self.thread and self.thread.is_alive():
             self._idle = False
         else:
-            self.thread = threading.Thread(None, self.mainloop, "RTPlotEventLoopThread", daemon=True)
+            self.thread = threading.Thread(None, self.mainloop, "RTPlot%sThread" %
+                                           ("Client" if self.client_side else "Server"), daemon=True)
             self.thread.start()
 
     def stop(self):
@@ -94,7 +96,7 @@ class ThreadedEventLoop():
 
     def _run_worker(self, w):
         try:
-            return w.step_work()
+            return w()
         except StopIteration:
             logger.debug("Worker raised StopIteration: %s", w)
             return False
@@ -103,8 +105,6 @@ class ThreadedEventLoop():
             return False
 
     def add_worker(self, w):
-        if not hasattr(w, "step_work") or not callable(w.step_work):
-            raise TypeError("Worker must have callable 'step_work' attribute")
         self.workers.add(w)
 
     def remove_worker(self, w):

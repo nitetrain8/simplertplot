@@ -107,7 +107,7 @@ class TestStartclient(unittest.TestCase):
         @return: None
         @rtype: None
         """
-        from simplertplot.plot import RTPlot
+        from simplertplot.userplot import RTPlot
         plot = RTPlot()
         plot.show()
         spawn_sin_producer2(plot)
@@ -164,7 +164,7 @@ def sin_producer2(sock, step=0.05, dt=0.01):
     buf = []
     i = 1
     q = queue.Queue()
-    prod = simplertplot.workers.UserSideProtocol(sock, q)
+    prod = simplertplot.protocol.UserSideProtocol(sock, q)
     prod.start()
     while True:
         y = math.sin(x)
@@ -187,7 +187,7 @@ def sin_producer3(sock, step=0.05, dt=0.01):
     buf = []
     i = 1
     q = queue.Queue()
-    prod = simplertplot.workers.UserSideProtocol(sock, q)
+    prod = simplertplot.protocol.UserSideProtocol(sock, q)
     prod.start()
     while True:
         y = math.sin(x)

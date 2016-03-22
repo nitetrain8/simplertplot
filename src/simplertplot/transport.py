@@ -92,19 +92,29 @@ class SocketTransport():
 
 
 class SimpleServer():
-    def __init__(self, host, port=0):
+    def __init__(self, host, port=0, timeout=None, blocking=False, backlog=1):
         sock = socket.socket()
         sock.bind((host, port))
-        sock.listen(1)
+        sock.listen(backlog)
+        if timeout is not None:
+            sock.settimeout(timeout)
+        if blocking is not None:
+            sock.settimeout(blocking)
         self.addr = sock.getsockname()
         self.sock = sock
 
     def get_addr(self):
         return self.addr
 
-    def accept_connection(self, block=True):
-        r, w, x = select((self.sock,), (), (), None if block else 0)
+    def accept_connection(self, block=True, timeout=10):
+        if block:
+            r, w, x = select((self.sock,), (), (), timeout)
+        else:
+            r, w, x = select((self.sock,), (), (), None)
         if self.sock in r:
             c, _ = self.sock.accept()
             return c
         return None
+
+    def fileno(self):
+        return self.sock.fileno()
