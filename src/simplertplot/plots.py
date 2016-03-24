@@ -13,7 +13,7 @@ import tkinter as tk
 from matplotlib import pyplot
 
 from simplertplot.queues import RingBuffer
-from simplertplot.workers import ClientProtocol
+from simplertplot.workers import TCPPlotServerProtocol
 
 __author__ = 'Nathan Starkweather'
 
@@ -28,13 +28,37 @@ logger.setLevel(logging.DEBUG)
 del _h, _f
 
 
-class RTPlotter():
+class BasePlotter():
+
+    def __init__(self, addr, max_pts, style):
+        self.max_pts = max_pts
+        self.style = style
+        self.addr = addr
+
+    def setup_pyplot(self):
+        raise NotImplementedError
+
+    def run_forever(self):
+        raise NotImplementedError
+
+    def start_client(self):
+        raise NotImplementedError
+
+    def run_plot(self):
+        raise NotImplementedError
+
+    def check_update(self):
+        raise NotImplementedError
+
+
+class XYPlotter(BasePlotter):
     """ Actual plotter process, running in spawned thread
     :ivar client: consumer protocol
     :type client: worker.ConsumerClientWorker
     """
 
     def __init__(self, addr, max_pts=1000, style='ggplot'):
+        super().__init__(addr, max_pts, style)
         assert max_pts > 0, "max_pts < 0: %s" % max_pts
         self.x_queue = RingBuffer(max_pts)
         self.y_queue = RingBuffer(max_pts)
@@ -48,7 +72,7 @@ class RTPlotter():
         self.npts_text = None
         self.debug_text = None
         self.debug_lines = ["", "", ""]
-        self.client = ClientProtocol(addr, self.x_queue, self.y_queue)
+        self.client = TCPPlotServerProtocol(self.addr, self.x_queue, self.y_queue)
 
     def clear_pyplot(self):
         if self.figure:
@@ -79,16 +103,19 @@ class RTPlotter():
         figure = pyplot.figure(num, figsize, dpi, facecolor, edgecolor, frameon)
         return figure
 
+    def start_client(self):
+        self.client.start()
+
     def run_forever(self):
         self.setup_pyplot()
         self.start_client()
         try:
             self.run_plot()
-        except tk.TclError:  # often throws on shutdown
+        except tk.TclError:
             pass
-
-    def start_client(self):
-        self.client.start()
+        except Exception:  # often throws on shutdown
+            logger.exception("Exception in run-plot mainloop")
+            raise
 
     def run_plot(self):
 
@@ -97,7 +124,7 @@ class RTPlotter():
         figure.draw(figure.canvas.renderer)
 
         frames = 0
-        update_data = self.update_data
+        check_update = self.check_update
 
         subplot = self.subplot
         line, = subplot.plot(self.x_data, self.y_data)
@@ -125,7 +152,7 @@ class RTPlotter():
             debug_lines[0] = ("FPS:%.1f" % fps)
             dbg_txt = '\n'.join(debug_lines)
             debug_text.set_text(dbg_txt)
-            if update_data():
+            if check_update():
                 line.set_data(self.x_data, self.y_data)
                 subplot.relim()
                 subplot.autoscale_view(True, True, True)
@@ -141,7 +168,7 @@ class RTPlotter():
             flush_events()
             frames += 1
 
-    def update_data(self):
+    def check_update(self):
         with self.client.lock_queue():
             if self.client.current_update:
                 self.x_data = self.x_queue.get()
@@ -152,3 +179,57 @@ class RTPlotter():
                 self.client.current_update = 0
                 return True
         return False
+
+
+class _EchoPlot(BasePlotter):
+    """ Plot that echos received data instead of
+    plotting it. Used for internal debugging. """
+
+    def __init__(self, addr, max_pts, style):
+        import socket
+        super().__init__(addr, max_pts, style)
+        self.sock = socket.socket()
+        self.sock.connect(addr)
+        self.writer = self.sock.makefile('wb')
+        self.reader = self.sock.makefile('rb')
+
+    def pong(self):
+        import select
+        r, _, _ = select.select((self.sock,), (), (), 1)
+        if self.sock not in r:
+            return
+        mlen = self.reader.read(3)
+        mlen = int(mlen)
+        msg = self.reader.read(mlen)
+        if msg.lower() == b'SYS_EXIT'.lower():
+            raise SystemExit(0)
+        self.writer.write(msg)
+        self.writer.flush()
+
+    def run_forever(self):
+        while True:
+            self.pong()
+
+    def run_plot(self):
+        pass
+
+    def check_update(self):
+        pass
+
+    def setup_pyplot(self):
+        pass
+
+    def start_client(self):
+        pass
+
+
+def get_plot_mapping():
+    plots = {
+        'xyplotter': XYPlotter,
+        'echo': _EchoPlot
+    }
+    return plots
+
+
+def get_plot_class(name):
+    return get_plot_mapping()[name]

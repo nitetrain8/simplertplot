@@ -49,8 +49,8 @@ class BaseProtocol():
         self.loop = loop
 
         if serial_method == 'pickle':
-            self.deserializer = pickle.load
-            self.serializer = pickle.dumps
+            self.deserialize = pickle.load
+            self.serialize = pickle.dumps
         else:
             raise ValueError(serial_method)
 
@@ -69,7 +69,7 @@ class BaseProtocol():
         self.loop.remove_worker(self)
 
 
-class UserSideProtocol(BaseProtocol):
+class UserClientProtocol(BaseProtocol):
 
     def __init__(self, client_socket, q, *, loop=None):
         """
@@ -89,7 +89,7 @@ class UserSideProtocol(BaseProtocol):
             op, data = self._queue.get(False, None)
         except queue.Empty:
             return
-        msg = self.serializer((op, data))
+        msg = self.serialize((op, data))
         self.transport.write(msg)
 
     def put_xy(self, x, y):
@@ -131,7 +131,7 @@ class UserSideProtocol(BaseProtocol):
         self._queue.put((self.OP_NP_XLYL, (xd, yd)))
 
 
-class ClientProtocol(BaseProtocol):
+class TCPPlotServerProtocol(BaseProtocol):
     transport_factory = SocketTransport
 
     def __init__(self, addr_or_sock, xq, yq, *, loop=None):
@@ -164,14 +164,14 @@ class ClientProtocol(BaseProtocol):
         lock = self.dlock
         tp = self.transport
         self.current_update = 0
-        deserializer = self.deserializer
+        deserialize = self.deserialize
 
         while True:
             yield
             if not tp.have_data():
                 continue
             try:
-                code, data = deserializer(tp)
+                code, data = deserialize(tp)
             except EOFError:
                 logger.debug("EOFError loading pickle: Connection Lost")
                 tp.reconnect()

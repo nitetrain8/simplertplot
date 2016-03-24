@@ -8,9 +8,8 @@ Created in: PyCharm Community Edition
 """
 import os
 
-from simplertplot.client_plotter import RTPlotter
-from simplertplot.workers import ClientProtocol
-from simplertplot.queues import RingBuffer
+import argparse
+from simplertplot.plots import get_plot_class
 
 __author__ = 'Nathan Starkweather'
 
@@ -29,13 +28,27 @@ logger.setLevel(logging.DEBUG)
 del _h, _f, _h2
 
 
-def start_client(argv):
-    host = argv[1]
-    port = int(argv[2])
+def parse_cmd_line(args):
+    p = argparse.ArgumentParser(description="Launch Real-Time Matplotlib Plot Server")
+    p.add_argument("host", type=str.lower)
+    p.add_argument("port", type=int)
+    p.add_argument("--plot", default="XYPlotter", type=str.lower)
+    p.add_argument("--mproto", default="tcp", help="Message protocol", choices=("tcp",), type=str.lower)
+    rv = p.parse_args(args)
+    return rv
+
+
+def start_client(ns):
+    host = ns.host
+    port = ns.port
+    plot = ns.plot
     addr = (host, port)
-    plotter = RTPlotter(addr, 10000, 'ggplot')
+    plt_kls = get_plot_class(plot)
+    plotter = plt_kls(addr, 10000, 'ggplot')
     plotter.run_forever()
 
 
-if __name__ == '__main__':
-    start_client()
+def proc_server_startup_main():
+    import sys
+    ns = parse_cmd_line(sys.argv[1:])
+    start_client(ns)

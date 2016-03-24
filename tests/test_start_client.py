@@ -81,6 +81,7 @@ def tearDownModule():
         except Exception:
             pass
 
+from simplertplot import userplot
 
 class TestStartclient(unittest.TestCase):
 #     @unittest.skip
@@ -107,11 +108,26 @@ class TestStartclient(unittest.TestCase):
         @return: None
         @rtype: None
         """
-        from simplertplot.plot import RTPlot
-        plot = RTPlot()
+
+        plot = userplot.RTPlot()
         plot.show()
         spawn_sin_producer2(plot)
         plot.popen.wait()
+
+    def test_start_client3(self):
+        plot = userplot._UserEchoPlot()
+        plot.show()
+
+        def check_ping(msg):
+            __tracebackhide__ = True
+            r, s = plot.ping(msg)
+            assert r == s
+
+        check_ping("Hello WOrld")
+        check_ping("Bye World")
+        check_ping("foobarbaz")
+        plot.stop()
+
 
 
 def spawn_sin_producer(addr):
@@ -164,7 +180,7 @@ def sin_producer2(sock, step=0.05, dt=0.01):
     buf = []
     i = 1
     q = queue.Queue()
-    prod = simplertplot.workers.UserSideProtocol(sock, q)
+    prod = simplertplot.workers.UserClientProtocol(sock, q)
     prod.start()
     while True:
         y = math.sin(x)
@@ -187,7 +203,7 @@ def sin_producer3(sock, step=0.05, dt=0.01):
     buf = []
     i = 1
     q = queue.Queue()
-    prod = simplertplot.workers.UserSideProtocol(sock, q)
+    prod = simplertplot.workers.UserClientProtocol(sock, q)
     prod.start()
     while True:
         y = math.sin(x)

@@ -22,6 +22,6 @@ del _h, _f
 from . import util
 from . import queues
 from . import workers
-from . import client_plotter
+from . import plots
 from . import start_client
 
