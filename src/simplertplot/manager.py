@@ -238,6 +238,6 @@ class StandaloneStartupManager(BaseManager):
 
         server = server_klass(host, port)
         t = server.accept_connection2()
-        plot = plot_klass(t, 100000, 'ggplot')
+        plot = plot_klass(t, 1000000, 'ggplot')
 
         return plot

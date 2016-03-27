@@ -187,7 +187,7 @@ class XYPlotter(BasePlotter):
         while not (_time() - start):
             pass
 
-        subplot.set_ymargin(0.02)
+        # subplot.set_ymargin(0.02)
 
         # mainloop
         while True:
@@ -200,6 +200,8 @@ class XYPlotter(BasePlotter):
                 line.set_data(self.x_data, self.y_data)
                 subplot.relim()
                 subplot.autoscale_view(True, True, True)
+                lower, upper = subplot.get_ybound()
+                subplot.set_ylim(lower, upper + (upper - lower) * 0.02, True, None)
                 figure.canvas.restore_region(background)
                 debug_lines[1] = "Data Points:%d" % _len(self.x_queue)
                 figure.draw_artist(xaxis)
@@ -215,6 +217,7 @@ class XYPlotter(BasePlotter):
 
             flush_events()
             frames += 1
+            time.sleep(0)
 
     def update_data(self):
         with self.client.lock_queue():
@@ -258,7 +261,6 @@ class _DummyPlotter(XYPlotter):
 
     def update_data(self, i):
         print("\rUpdated data: %d" % i, end="")
-
 
 
 class _EchoPlot(BasePlotter):

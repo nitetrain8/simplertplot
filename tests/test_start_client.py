@@ -149,6 +149,31 @@ class TestStartclient(unittest.TestCase):
         m.spawn_server()
         m.wait()
 
+    def test_start_client4(self):
+        """
+        @return: None
+        @rtype: None
+        """
+
+        plot = userplot.RTPlot()
+        plot.show()
+        spawn_sin_producer3(plot)
+        fut = plot.test_rpc("Hello WOrld!")
+        rsp = fut.result()
+        assert rsp == len("Hello WOrld!")
+        while True:
+            try:
+                plot.manager.popen.wait(1)
+            except subprocess.TimeoutExpired:
+                pass
+            else:
+                break
+            if not len(plot.manager.proto_event_loop.workers):
+                plot.manager.proto_event_loop.stop()
+                break
+
+        plot.destroy()
+
 
 def spawn_sin_producer(addr):
     server = socket.socket()
@@ -167,6 +192,19 @@ def spawn_sin_producer2(plot):
     dt = 0.0005
     dt = 0
     thread = threading.Thread(None, sin_producer4, "ProdThread", (plot, step, dt), daemon=True)
+    thread.start()
+
+def spawn_sin_producer3(plot):
+    step = 0.0005
+    dt = 0.0005
+    args = []
+    for i in range(20):
+        args.append(wave1((i % 3) + 1, (i+1)*np.pi))
+    for a in args:
+        next(a)
+    args2 = [plot, step, dt]
+    args2.extend(args)
+    thread = threading.Thread(None, wave_producer, "ProdThread", args2, daemon=True)
     thread.start()
 
 
@@ -265,6 +303,26 @@ def sin_producer4(plot, step=0.05, dt=0.01):
         time.sleep(dt)
         i += 1
 
+
+def wave1(amplitude=1, period=2*math.pi):
+    yield
+    x = 0
+    two_pi = 2*math.pi
+    while True:
+        x = yield amplitude * math.sin(x * two_pi / period)
+
+
+def wave_producer(plot, step, dt, *waves):
+    assert isinstance(plot, simplertplot.userplot.RTPlot)
+    x = 0
+    while True:
+        y = 0
+        for w in waves:
+            y1 = w.send(x)
+            y += y1
+        plot.put_xy(x, y)
+        # time.sleep(dt)
+        x += step
 
 if __name__ == '__main__':
     unittest.main()
