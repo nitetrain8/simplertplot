@@ -19,7 +19,7 @@ import subprocess, sys
 from os.path import dirname, join, exists, basename
 from shutil import rmtree
 import logging
-
+import matplotlib.animation
 import numpy as np
 
 import simplertplot
@@ -155,7 +155,7 @@ class TestStartclient(unittest.TestCase):
         @rtype: None
         """
 
-        plot = userplot.RTPlot()
+        plot = userplot.RTPlot(10e4)
         plot.show()
         spawn_sin_producer3(plot)
         fut = plot.test_rpc("Hello WOrld!")
@@ -194,9 +194,13 @@ def spawn_sin_producer2(plot):
     thread = threading.Thread(None, sin_producer4, "ProdThread", (plot, step, dt), daemon=True)
     thread.start()
 
+
 def spawn_sin_producer3(plot):
     step = 0.0005
-    dt = 0.0005
+    dt = .001
+    # dt = 0
+    # step *= 10**3
+    # dt *= 10**3
     args = []
     for i in range(20):
         args.append(wave1((i % 3) + 1, (i+1)*np.pi))
@@ -278,8 +282,7 @@ def sin_producer3(sock, step=0.05, dt=0.01):
             buf.clear()
         end = time.time() + dt
         while time.time() < end:
-            pass
-        # time.sleep(dt)
+            time.sleep(0)
 
         i += 1
 
@@ -304,25 +307,26 @@ def sin_producer4(plot, step=0.05, dt=0.01):
         i += 1
 
 
-def wave1(amplitude=1, period=2*math.pi):
+def wave1(amplitude=1, period=2*np.pi):
     yield
     x = 0
-    two_pi = 2*math.pi
+    two_pi = 2*np.pi
     while True:
-        x = yield amplitude * math.sin(x * two_pi / period)
+        x = yield amplitude * np.sin(x * two_pi / period)
 
 
 def wave_producer(plot, step, dt, *waves):
     assert isinstance(plot, simplertplot.userplot.RTPlot)
-    x = 0
+    sends = [w.send for w in waves]
+    per_iter = 1000
+    x1 = np.linspace(0, step * per_iter, per_iter, dtype=float)
     while True:
-        y = 0
-        for w in waves:
-            y1 = w.send(x)
-            y += y1
-        plot.put_xy(x, y)
-        # time.sleep(dt)
-        x += step
+        y = np.zeros(per_iter, float)
+        for send in sends:
+            y += send(x1)
+        plot.put_np_xlyl(x1, y)
+        time.sleep(dt)
+        x1 += (step * per_iter + step)
 
 if __name__ == '__main__':
     unittest.main()

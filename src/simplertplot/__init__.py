@@ -25,5 +25,6 @@ from . import protocols
 from . import eventloop
 from . import transport
 from . import manager
+from . import userplot
 from . import plots
 

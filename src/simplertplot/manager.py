@@ -106,12 +106,12 @@ class UserManager(BaseManager):
         self.manager_server = transport.TCPServer(host, port)
         self.server_procs = []
 
-    def spawn_standalone(self, addr, plot, mproto, proto_factory):
+    def spawn_standalone(self, addr, plot, style, max_pts, mproto, proto_factory):
         python = sys.executable
         host, port = addr
-        cmd = "%s -c %s %s %d --plot=%s --mproto=%s" % (util.quote(python),
+        cmd = "%s -c %s %s %d --plot=%s --mproto=%s --style=%s --max-pts=%d" % (util.quote(python),
                                                         util.quote(_spawn_standalone_src),
-                                                        host, port, plot, mproto)
+                                                        host, port, plot, mproto, style, max_pts)
         self.popen = subprocess.Popen(cmd)
         return self._make_protocol(addr, mproto, proto_factory)
 
@@ -215,6 +215,7 @@ class StandaloneStartupManager(BaseManager):
         self.plotter = plotter
 
     def run_plot(self):
+        self.plotter.client.blocking_io = True
         self.plotter.run_forever()
 
     def parse_cmd_line(self, args):
@@ -222,6 +223,8 @@ class StandaloneStartupManager(BaseManager):
         p.add_argument("host", type=str.lower)
         p.add_argument("port", type=int)
         p.add_argument("--plot", default="XYPlotter", type=str.lower)
+        p.add_argument("--max-pts", default=300000, type=int)
+        p.add_argument("--style", default='ggplot', type=str.lower)
         p.add_argument("--mproto", default="tcp", help="Message protocol", choices=("tcp",), type=str.lower)
         rv = p.parse_args(args)
         return rv
@@ -231,6 +234,8 @@ class StandaloneStartupManager(BaseManager):
         host = ns.host
         port = ns.port
         plot = ns.plot
+        style = ns.style
+        max_pts = ns.max_pts
         mproto = ns.mproto
 
         server_klass = transport.get_server_class(mproto)
@@ -238,6 +243,6 @@ class StandaloneStartupManager(BaseManager):
 
         server = server_klass(host, port)
         t = server.accept_connection2()
-        plot = plot_klass(t, 1000000, 'ggplot')
+        plot = plot_klass(t, max_pts, style)
 
         return plot

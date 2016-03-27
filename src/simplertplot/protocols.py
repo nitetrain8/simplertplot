@@ -61,7 +61,7 @@ class BaseProtocol():
     OP_RPC = 6
     _NP_DTYPE = np.float64
 
-    def __init__(self, serial_method='pickle'):
+    def __init__(self, serial_method='pickle', blocking_io=False):
         self.dlock = threading.Lock()
         self.transport = None
         if serial_method == 'pickle':
@@ -70,6 +70,7 @@ class BaseProtocol():
         else:
             raise ValueError(serial_method)
         self._pending_futures = {}
+        self.blocking_io = blocking_io
 
     def connection_made(self, transport):
         self.transport = transport
@@ -99,7 +100,7 @@ class XYUserProtocol(BaseProtocol):
         while self.transport is None:
             yield
         while True:
-            r, w, x = self.transport.select()
+            r, w, x = self.transport.select(None if self.blocking_io else 0)
             if w:
                 try:
                     op, data = self._queue.get(False, None)
@@ -205,7 +206,7 @@ class XYPlotterProtocol(BaseProtocol):
 
         while True:
             yield
-            r, w, _ = tp.select()
+            r, w, _ = tp.select(None if self.blocking_io else 0)
             if r:
                 try:
                     code, data = deserialize(tp)

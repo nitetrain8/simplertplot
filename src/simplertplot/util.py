@@ -38,3 +38,5 @@ def borrow_docstring(lender, sep='\n\n'):
 def quote(s):
     s = s.strip('"').strip("'")
     return '"%s"' % s
+
+

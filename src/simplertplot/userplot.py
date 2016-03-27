@@ -14,6 +14,7 @@ import logging
 from simplertplot import protocols
 from simplertplot import transport
 import queue
+import simplertplot
 
 logger = logging.getLogger(__name__)
 _h = logging.StreamHandler()
@@ -30,7 +31,7 @@ class RTPlot():
     _DEFAULT_HOST = 'localhost'
     _DEFAULT_PORT = 18043
 
-    def __init__(self, max_pts=1000, style='ggplot', con_type='tcp'):
+    def __init__(self, max_pts=10000, style='ggplot', con_type='tcp'):
         self.max_pts = max_pts
         self.style = style
         self.con_type = con_type
@@ -38,12 +39,12 @@ class RTPlot():
         self.queue = queue.Queue(max_pts)
 
     def show(self):
-        from simplertplot import manager
-        self.manager = manager.get_user_manager()
-        host = self._DEFAULT_HOST
-        port = self._DEFAULT_PORT
         proto_factory = lambda: protocols.XYUserProtocol(self.queue)
-        self.producer = self.manager.spawn_standalone((host, port), self.plot_type, self.con_type, proto_factory)
+
+        self.manager = simplertplot.manager.get_user_manager()
+        self.producer = self.manager.spawn_standalone((self._DEFAULT_HOST, self._DEFAULT_PORT), self.plot_type,
+                                                      self.style, self.max_pts,
+                                                      self.con_type, proto_factory)
         self.manager.run_protocol(self.producer)
 
     def destroy(self):

@@ -17,6 +17,7 @@ from matplotlib.ticker import NullFormatter, NullLocator
 
 from simplertplot.queues import RingBuffer
 from simplertplot.protocols import XYPlotterProtocol, RPCRequest, RPCResponse
+from simplertplot import manager
 
 __author__ = 'Nathan Starkweather'
 
@@ -115,7 +116,6 @@ class XYPlotter(BasePlotter):
         return figure
 
     def start_client(self):
-        from simplertplot import manager
         manager.get_process_manager().run_protocol(self.client)
 
     def run_forever(self):
@@ -128,6 +128,26 @@ class XYPlotter(BasePlotter):
         except Exception:  # often throws on shutdown
             logger.exception("Exception in run-plot mainloop")
             raise
+
+    def vsync(self, target_fps):
+        _time = time.time
+        _sleep = time.sleep
+        last_call = _time()
+        per_frame = 1 / target_fps
+        min_sleep_thres = 0.01
+        yield
+        while True:
+            nxt = last_call + per_frame
+            while True:
+                now = _time()
+                if now > nxt:
+                    break
+                wait = nxt - now
+                if wait < min_sleep_thres:
+                    break
+                _sleep(wait)
+            last_call = _time()
+
 
     def run_plot(self):
 
@@ -166,6 +186,7 @@ class XYPlotter(BasePlotter):
         yaxis.set_major_formatter(ymjf)
         yaxis.set_major_locator(ymjl)
 
+        # initial draw
         figure.draw(r)
 
         frames = 0
@@ -187,7 +208,11 @@ class XYPlotter(BasePlotter):
         while not (_time() - start):
             pass
 
-        # subplot.set_ymargin(0.02)
+        throttle_fps = self.vsync(30).__next__
+
+        # final initial draw
+        figure.draw(r)
+        blit(all_bbox)
 
         # mainloop
         while True:
@@ -209,15 +234,15 @@ class XYPlotter(BasePlotter):
                 figure.draw_artist(line)
                 figure.draw_artist(debug_text)
                 blit(all_bbox)
-                blit(yaxis.get_window_extent(r))
+
             else:
                 figure.canvas.restore_region(background)
-                subplot.draw_artist(debug_text)
-                blit(debug_text.get_window_extent())
+                debug_text.draw(r)
+                blit(debug_text.get_window_extent())  # don't cache bbox here, in case text size changes
 
+            throttle_fps()
             flush_events()
             frames += 1
-            time.sleep(0)
 
     def update_data(self):
         with self.client.lock_queue():
@@ -226,7 +251,6 @@ class XYPlotter(BasePlotter):
                 self.y_data = self.y_queue.get()
                 txt1 = "Current Queue Read: %d" % self.client.current_update
                 self.debug_lines[2] = txt1
-                assert len(self.x_data) == len(self.y_data)
                 self.client.current_update = 0
                 return True
         return False
@@ -249,18 +273,6 @@ class XYPlotter(BasePlotter):
     def test_rpc(self, msg):
         print("GOT RPC MSG:", msg)
         return len(msg)
-
-
-class _DummyPlotter(XYPlotter):
-    def run_plot(self):
-        yield
-        i = 1
-        self.update_data(i)
-        self.process_rpc()
-        i += 1
-
-    def update_data(self, i):
-        print("\rUpdated data: %d" % i, end="")
 
 
 class _EchoPlot(BasePlotter):
