@@ -56,12 +56,16 @@ class ThreadedEventLoop():
             self.thread.start()
 
     def stop(self):
-        raise _StopEventLoop
+        def _stop():
+            raise _StopEventLoop
+        self.workers.add(_stop)
 
     run_forever = start
 
     def mainloop(self):
         while True:
+            while self._idle:
+                self._sleep_idle()
             try:
                 self._inner_mainloop()
             except _StopEventLoop:
@@ -70,8 +74,6 @@ class ThreadedEventLoop():
             except _ExitThread:
                 logger.debug("Got Exit Thread signal", exc_info=True)
                 return
-            while self._idle:
-                self._sleep_idle()
 
     def _sleep_idle(self):
         sleep(self.idle_sleeptime)

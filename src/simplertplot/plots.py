@@ -12,6 +12,8 @@ import time
 import tkinter as tk
 
 from matplotlib import pyplot
+import matplotlib.transforms
+from matplotlib.ticker import NullFormatter, NullLocator
 
 from simplertplot.queues import RingBuffer
 from simplertplot.protocols import XYPlotterProtocol, RPCRequest, RPCResponse
@@ -131,31 +133,61 @@ class XYPlotter(BasePlotter):
 
         figure = self.figure
         figure.show()
-        figure.draw(figure.canvas.renderer)
+        r = figure.canvas.renderer
+        subplot = self.subplot
+
+        xaxis = subplot.xaxis
+        yaxis = subplot.yaxis
+        bboxes = xaxis.get_window_extent(r), yaxis.get_window_extent(r), subplot.bbox
+        all_bbox = matplotlib.transforms.Bbox.union(bboxes)
+
+        # The following is a (hack?) to obtain a copy of the canvas background
+        # without the ticks or tick labels, to allow tick label blitting to
+        # work correctly. Without this, the copy_from_background() method copies
+        # a background that has the default tick marks in place, which causes blit()
+        # updates to be drawn on top of a background containing existing tick marks.
+        # So, ticks are hidden, the emtpy canvas is redrawn, background is cached, and
+        # then ticks are restored.
+
+        xmjf = xaxis.get_major_formatter()
+        xmjl = xaxis.get_major_locator()
+        ymjf = yaxis.get_major_formatter()
+        ymjl = yaxis.get_major_locator()
+        xaxis.set_major_formatter(NullFormatter())
+        xaxis.set_major_locator(NullLocator())
+        yaxis.set_major_formatter(NullFormatter())
+        yaxis.set_major_locator(NullLocator())
+
+        figure.canvas.draw()
+        background = figure.canvas.copy_from_bbox(all_bbox)
+
+        xaxis.set_major_formatter(xmjf)
+        xaxis.set_major_locator(xmjl)
+        yaxis.set_major_formatter(ymjf)
+        yaxis.set_major_locator(ymjl)
+
+        figure.draw(r)
 
         frames = 0
         update_data = self.update_data
 
-        subplot = self.subplot
         line, = subplot.plot(self.x_data, self.y_data)
-        background = figure.canvas.copy_from_bbox(subplot.bbox)
+        line.background = background
         debug_text = self.debug_text
         debug_lines = self.debug_lines
         process_rpc = self.process_rpc
 
         blit = self.figure.canvas.blit
-        subplot_bbox = self.subplot.bbox
         flush_events = figure.canvas.flush_events
-        xaxis = subplot.xaxis
-        yaxis = subplot.yaxis
 
         _len = len
         _time = time.time
         start = _time()
-
         # avoid ZeroDivisionError on floating point arithmetic for fps calc
         while not (_time() - start):
             pass
+
+        subplot.set_ymargin(0.02)
 
         # mainloop
         while True:
@@ -170,8 +202,12 @@ class XYPlotter(BasePlotter):
                 subplot.autoscale_view(True, True, True)
                 figure.canvas.restore_region(background)
                 debug_lines[1] = "Data Points:%d" % _len(self.x_queue)
-                figure.draw_artist(subplot)
-                blit(subplot_bbox)
+                figure.draw_artist(xaxis)
+                figure.draw_artist(yaxis)
+                figure.draw_artist(line)
+                figure.draw_artist(debug_text)
+                blit(all_bbox)
+                blit(yaxis.get_window_extent(r))
             else:
                 figure.canvas.restore_region(background)
                 subplot.draw_artist(debug_text)

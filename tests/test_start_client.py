@@ -116,7 +116,17 @@ class TestStartclient(unittest.TestCase):
         fut = plot.test_rpc("Hello WOrld!")
         rsp = fut.result()
         assert rsp == len("Hello WOrld!")
-        plot.manager.popen.wait()
+        while True:
+            try:
+                plot.manager.popen.wait(1)
+            except subprocess.TimeoutExpired:
+                pass
+            else:
+                break
+            if not len(plot.manager.proto_event_loop.workers):
+                plot.manager.proto_event_loop.stop()
+                break
+
         plot.destroy()
 
     def test_start_client3(self):
