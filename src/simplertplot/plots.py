@@ -6,6 +6,7 @@ Created in: PyCharm Community Edition
 
 
 """
+import queue
 import threading
 import time
 import tkinter as tk
@@ -13,7 +14,7 @@ import tkinter as tk
 from matplotlib import pyplot
 
 from simplertplot.queues import RingBuffer
-from simplertplot.workers import TCPPlotServerProtocol
+from simplertplot.protocols import XYPlotterProtocol, RPCRequest, RPCResponse
 
 __author__ = 'Nathan Starkweather'
 
@@ -30,10 +31,10 @@ del _h, _f
 
 class BasePlotter():
 
-    def __init__(self, addr, max_pts, style):
+    def __init__(self, transport, max_pts, style):
         self.max_pts = max_pts
         self.style = style
-        self.addr = addr
+        self.transport = transport
 
     def setup_pyplot(self):
         raise NotImplementedError
@@ -47,7 +48,7 @@ class BasePlotter():
     def run_plot(self):
         raise NotImplementedError
 
-    def check_update(self):
+    def update_data(self):
         raise NotImplementedError
 
 
@@ -57,11 +58,13 @@ class XYPlotter(BasePlotter):
     :type client: worker.ConsumerClientWorker
     """
 
-    def __init__(self, addr, max_pts=1000, style='ggplot'):
-        super().__init__(addr, max_pts, style)
+    def __init__(self, transport, max_pts=1000, style='ggplot'):
+        super().__init__(transport, max_pts, style)
         assert max_pts > 0, "max_pts < 0: %s" % max_pts
         self.x_queue = RingBuffer(max_pts)
         self.y_queue = RingBuffer(max_pts)
+        self.rpc_req = queue.Queue()
+        self.rpc_rsp = queue.Queue()
         self.x_data = []
         self.y_data = []
         self.max_pts = max_pts
@@ -72,7 +75,8 @@ class XYPlotter(BasePlotter):
         self.npts_text = None
         self.debug_text = None
         self.debug_lines = ["", "", ""]
-        self.client = TCPPlotServerProtocol(self.addr, self.x_queue, self.y_queue)
+        self.client = XYPlotterProtocol(self.x_queue, self.y_queue, self.rpc_req, self.rpc_rsp)
+        self.client.connection_made(transport)
 
     def clear_pyplot(self):
         if self.figure:
@@ -82,6 +86,11 @@ class XYPlotter(BasePlotter):
         self.fps_text = None
         self.npts_text = None
         self.debug_text = None
+
+    def destroy(self):
+        """ Destroy the plot, freeing all references """
+        while self.__dict__:
+            self.__dict__.pop()
 
     def setup_pyplot(self):
         """ Plot setup boilerplate """
@@ -104,7 +113,8 @@ class XYPlotter(BasePlotter):
         return figure
 
     def start_client(self):
-        self.client.start()
+        from simplertplot import manager
+        manager.get_process_manager().run_protocol(self.client)
 
     def run_forever(self):
         self.setup_pyplot()
@@ -124,13 +134,14 @@ class XYPlotter(BasePlotter):
         figure.draw(figure.canvas.renderer)
 
         frames = 0
-        check_update = self.check_update
+        update_data = self.update_data
 
         subplot = self.subplot
         line, = subplot.plot(self.x_data, self.y_data)
         background = figure.canvas.copy_from_bbox(subplot.bbox)
         debug_text = self.debug_text
         debug_lines = self.debug_lines
+        process_rpc = self.process_rpc
 
         blit = self.figure.canvas.blit
         subplot_bbox = self.subplot.bbox
@@ -148,11 +159,12 @@ class XYPlotter(BasePlotter):
 
         # mainloop
         while True:
+            process_rpc()
             fps = frames / (_time() - start)
             debug_lines[0] = ("FPS:%.1f" % fps)
             dbg_txt = '\n'.join(debug_lines)
             debug_text.set_text(dbg_txt)
-            if check_update():
+            if update_data():
                 line.set_data(self.x_data, self.y_data)
                 subplot.relim()
                 subplot.autoscale_view(True, True, True)
@@ -168,7 +180,7 @@ class XYPlotter(BasePlotter):
             flush_events()
             frames += 1
 
-    def check_update(self):
+    def update_data(self):
         with self.client.lock_queue():
             if self.client.current_update:
                 self.x_data = self.x_queue.get()
@@ -180,23 +192,51 @@ class XYPlotter(BasePlotter):
                 return True
         return False
 
+    def process_rpc(self):
+        try:
+            req = self.rpc_req.get(False)
+        except queue.Empty:
+            return
+        else:
+            try:
+                func = getattr(self, req.func)
+                rv = func(*req.args, **req.kwargs)
+            except Exception as e:
+                rsp = req.respond(exc=e)
+            else:
+                rsp = req.respond(value=rv)
+            self.rpc_rsp.put(rsp)
+
+    def test_rpc(self, msg):
+        print("GOT RPC MSG:", msg)
+        return len(msg)
+
+
+class _DummyPlotter(XYPlotter):
+    def run_plot(self):
+        yield
+        i = 1
+        self.update_data(i)
+        self.process_rpc()
+        i += 1
+
+    def update_data(self, i):
+        print("\rUpdated data: %d" % i, end="")
+
+
 
 class _EchoPlot(BasePlotter):
     """ Plot that echos received data instead of
     plotting it. Used for internal debugging. """
 
-    def __init__(self, addr, max_pts, style):
-        import socket
-        super().__init__(addr, max_pts, style)
-        self.sock = socket.socket()
-        self.sock.connect(addr)
-        self.writer = self.sock.makefile('wb')
-        self.reader = self.sock.makefile('rb')
+    def __init__(self, transport, max_pts, style):
+        from . import transport
+        super().__init__(transport, max_pts, style)
+        self.transport = transport.SocketTransport.from_address(transport)
+        self.reader = self.writer = self.transport
 
     def pong(self):
-        import select
-        r, _, _ = select.select((self.sock,), (), (), 1)
-        if self.sock not in r:
+        if not self.transport.read_ready():
             return
         mlen = self.reader.read(3)
         mlen = int(mlen)
@@ -204,7 +244,6 @@ class _EchoPlot(BasePlotter):
         if msg.lower() == b'SYS_EXIT'.lower():
             raise SystemExit(0)
         self.writer.write(msg)
-        self.writer.flush()
 
     def run_forever(self):
         while True:
@@ -213,7 +252,7 @@ class _EchoPlot(BasePlotter):
     def run_plot(self):
         pass
 
-    def check_update(self):
+    def update_data(self):
         pass
 
     def setup_pyplot(self):

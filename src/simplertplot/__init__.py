@@ -21,7 +21,9 @@ del _h, _f
 
 from . import util
 from . import queues
-from . import workers
+from . import protocols
+from . import eventloop
+from . import transport
+from . import manager
 from . import plots
-from . import start_client
 

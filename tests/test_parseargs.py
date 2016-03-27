@@ -68,7 +68,7 @@ def teardown_module():
             pass
 
 
-from simplertplot.start_client import parse_cmd_line
+from simplertplot.manager import parse_cmd_line
 
 
 def test_parseargs1():

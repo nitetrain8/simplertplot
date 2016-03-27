@@ -42,6 +42,9 @@
           <option value="dlock" />
           <option value="y_q" />
           <option value="x_q" />
+          <option value="np_xyl" />
+          <option value="simplertplot.workers.client_socket" />
+          <option value="client_socket" />
         </list>
       </option>
     </inspection_tool>

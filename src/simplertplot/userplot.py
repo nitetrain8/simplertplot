@@ -6,13 +6,12 @@ Created in: PyCharm Community Edition
 
 
 """
+
 __author__ = 'Nathan Starkweather'
 
 import logging
-import sys
-import subprocess
-from simplertplot import util
-from simplertplot import workers
+
+from simplertplot import protocols
 from simplertplot import transport
 import queue
 
@@ -26,20 +25,10 @@ logger.setLevel(logging.DEBUG)
 del _h, _f
 
 
-_spawn_src = """
-from simplertplot import start_client
-start_client.proc_server_startup_main()
-"""
-
-
-def _spawn_process(host, port, plot):
-    python = sys.executable
-    cmd = "%s -c %s %s %d --plot=%s" % (util.quote(python), util.quote(_spawn_src), host, port, plot)
-    return subprocess.Popen(cmd)
-
-
 class RTPlot():
-    _plot_type_ = "xyplotter"
+    plot_type = "xyplotter"
+    _DEFAULT_HOST = 'localhost'
+    _DEFAULT_PORT = 18043
 
     def __init__(self, max_pts=1000, style='ggplot', con_type='tcp'):
         self.max_pts = max_pts
@@ -47,17 +36,24 @@ class RTPlot():
         self.con_type = con_type
         self.producer = None
         self.queue = queue.Queue(max_pts)
-        self.popen = None
 
     def show(self):
-        assert self.con_type == 'tcp'
-        host = 'localhost'
-        s = transport.SimpleServer(host)
-        host, port = s.get_addr()
-        self.popen = _spawn_process(host, port, self._plot_type_)
-        client = s.accept_connection(True)
-        self.producer = workers.UserClientProtocol(client, self.queue)
-        self.producer.start()
+        from simplertplot import manager
+        self.manager = manager.get_user_manager()
+        host = self._DEFAULT_HOST
+        port = self._DEFAULT_PORT
+        proto_factory = lambda: protocols.XYUserProtocol(self.queue)
+        self.producer = self.manager.spawn_standalone((host, port), self.plot_type, self.con_type, proto_factory)
+        self.manager.run_protocol(self.producer)
+
+    def destroy(self):
+        """ Destroy the plot, freeing all references """
+        self.manager.stop_protocol(self.producer)
+        while self.__dict__:
+            self.__dict__.popitem()
+
+    def test_rpc(self, msg):
+        return self.producer.put_rpc("test_rpc", msg)
 
     def put_xy(self, x, y):
         self.producer.put_xy(x, y)
@@ -76,13 +72,15 @@ class RTPlot():
 
 
 class _UserEchoPlot():
+    plot_type = "echo"
+
     def __init__(self):
         pass
 
     def show(self):
         host = 'localhost'
         port = 0
-        self.server = transport.SimpleServer(host, port)
+        self.server = transport.TCPServer(host, port)
         host, port = self.server.get_addr()
         self.popen = _spawn_process(host, port, "echo")
         self.client_sock = self.server.accept_connection()

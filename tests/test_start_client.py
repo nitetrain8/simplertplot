@@ -83,6 +83,7 @@ def tearDownModule():
 
 from simplertplot import userplot
 
+
 class TestStartclient(unittest.TestCase):
 #     @unittest.skip
 #     def test_start_client(self):
@@ -112,7 +113,11 @@ class TestStartclient(unittest.TestCase):
         plot = userplot.RTPlot()
         plot.show()
         spawn_sin_producer2(plot)
-        plot.popen.wait()
+        fut = plot.test_rpc("Hello WOrld!")
+        rsp = fut.result()
+        assert rsp == len("Hello WOrld!")
+        plot.manager.popen.wait()
+        plot.destroy()
 
     def test_start_client3(self):
         plot = userplot._UserEchoPlot()
@@ -128,6 +133,11 @@ class TestStartclient(unittest.TestCase):
         check_ping("foobarbaz")
         plot.stop()
 
+    def test_start_manager(self):
+        from simplertplot import manager
+        m = manager.UserManager()
+        m.spawn_server()
+        m.wait()
 
 
 def spawn_sin_producer(addr):
@@ -145,6 +155,7 @@ def spawn_sin_producer(addr):
 def spawn_sin_producer2(plot):
     step = 0.0005
     dt = 0.0005
+    dt = 0
     thread = threading.Thread(None, sin_producer4, "ProdThread", (plot, step, dt), daemon=True)
     thread.start()
 
@@ -180,7 +191,7 @@ def sin_producer2(sock, step=0.05, dt=0.01):
     buf = []
     i = 1
     q = queue.Queue()
-    prod = simplertplot.workers.UserClientProtocol(sock, q)
+    prod = simplertplot.protocols.XYUserProtocol(sock, q)
     prod.start()
     while True:
         y = math.sin(x)
@@ -190,7 +201,8 @@ def sin_producer2(sock, step=0.05, dt=0.01):
             i = 0
             prod.put_xyl(buf)
             buf.clear()
-        time.sleep(dt)
+        if dt:
+            time.sleep(dt)
         i += 1
 
 
@@ -203,7 +215,7 @@ def sin_producer3(sock, step=0.05, dt=0.01):
     buf = []
     i = 1
     q = queue.Queue()
-    prod = simplertplot.workers.UserClientProtocol(sock, q)
+    prod = simplertplot.protocols.XYUserProtocol(sock, q)
     prod.start()
     while True:
         y = math.sin(x)

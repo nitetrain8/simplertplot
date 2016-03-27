@@ -45,7 +45,7 @@ class ThreadedEventLoop():
         self.thread = None
         self.workers = set()
         self._idle = False
-        self.idle_sleeptime = .1
+        self.idle_sleeptime = .5
         self.start()
 
     def start(self):
@@ -94,7 +94,7 @@ class ThreadedEventLoop():
 
     def _run_worker(self, w):
         try:
-            return w.step_work()
+            return w()
         except StopIteration:
             logger.debug("Worker raised StopIteration: %s", w)
             return False
@@ -103,8 +103,6 @@ class ThreadedEventLoop():
             return False
 
     def add_worker(self, w):
-        if not hasattr(w, "step_work") or not callable(w.step_work):
-            raise TypeError("Worker must have callable 'step_work' attribute")
         self.workers.add(w)
 
     def remove_worker(self, w):
@@ -112,3 +110,4 @@ class ThreadedEventLoop():
             self.workers.remove(w)
         except KeyError:
             logger.warning("Attempted to remove non-existent worker: %s", w)
+
